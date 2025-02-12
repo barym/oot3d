@@ -14,9 +14,9 @@ for include in includePaths:
     ccArgs = ccArgs + f"-I{include} "
 
 if 'ARMCC_PATH' in os.environ:
-    CC: Path = Path(os.environ['ARMCC_PATH']) / "win_32-pentium/armcc"
+    CC: Path = Path(os.environ['ARMCC_PATH']) / "win_32-pentium/armcc.exe"
 else:
     print("ARMCC_PATH environment variable is not set, trying gcc")
     CC: Path = Path("gcc")
 
-subprocess.run(f"{CC} {ccArgs} {sourceFile}")
+subprocess.run(f"{CC} {ccArgs} {sourceFile}", shell=True)

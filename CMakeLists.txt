@@ -19,34 +19,37 @@ find_program(ARM_CC NAMES armcc.exe PATHS "$ENV{ARMCC_PATH}/win_32-pentium" REQU
 find_program(ARM_LINK NAMES armlink.exe PATHS "$ENV{ARMCC_PATH}/win_32-pentium" REQUIRED NO_DEFAULT_PATH)
 find_program(ARM_FROMELF NAMES fromelf.exe PATHS "$ENV{ARMCC_PATH}/win_32-pentium" REQUIRED NO_DEFAULT_PATH)
 
-macro (set_compilers)
-    set(CMAKE_CXX_COMPILER_ID ARMCC)
+set(CMAKE_CXX_COMPILER_ID ARMCC)
 
-    set(CMAKE_AR ${ARM_AR})
-    set(CMAKE_C_COMPILER ${ARM_CC})
-    set(CMAKE_CXX_COMPILER ${ARM_CC})
-    set(CMAKE_ASM_COMPILER ${ARM_ASM})
-    set(CMAKE_LINKER ${ARM_LINK})
-endmacro()
+set(CMAKE_AR ${ARM_AR})
+set(CMAKE_C_COMPILER ${ARM_CC})
+set(CMAKE_CXX_COMPILER ${ARM_CC})
+set(CMAKE_ASM_COMPILER ${ARM_ASM})
+set(CMAKE_LINKER ${ARM_LINK})
 
-if (WIN32)
-    set_compilers()
-    set(CMAKE_C_COMPILER_WORKS TRUE)
-    set(CMAKE_CXX_COMPILER_WORKS TRUE)
-    set(CMAKE_ASM_COMPILER_WORKS TRUE)
+set(CMAKE_C_COMPILER_WORKS TRUE)
+set(CMAKE_CXX_COMPILER_WORKS TRUE)
+set(CMAKE_ASM_COMPILER_WORKS TRUE)
+
+if (NOT (CMAKE_SYSTEM_NAME STREQUAL "Windows"))
+    # Not on windows but calling windows programs, probably with wine.
+    # Windows has a lower command line length limit than Linux so passing a full length link command won't work.
+    set(CMAKE_CXX_USE_RESPONSE_FILE_FOR_OBJECTS TRUE)
+
+    if (CMAKE_GENERATOR STREQUAL "Ninja")
+        # The above doesn't work on ninja so do this instead.
+        set(CMAKE_NINJA_FORCE_RESPONSE_FILE ON)
+
+        # Can only turn on response files for all commands so need to set how to handle other command types
+        set(CMAKE_C_RESPONSE_FILE_FLAG "--via=")
+        set(CMAKE_CXX_RESPONSE_FILE_FLAG "--via=")
+        set(CMAKE_ASM_RESPONSE_FILE_FLAG "--via=")
+    endif()
 endif()
 
 project(oot3d C CXX ASM)
 
-if (NOT WIN32)
-    set_compilers()
-endif()
-
 set(CMAKE_EXECUTABLE_SUFFIX ".axf")
-
-__compiler_armcc(C)
-__compiler_armcc(CXX)
-__compiler_armcc(ASM)
 
 add_subdirectory(library)
 add_subdirectory(disassembly)
@@ -74,7 +77,7 @@ add_executable(oot3d ${csourcefiles} ${cxxsourcefiles})
 add_custom_command(
     DEPENDS oot3d ${CMAKE_CURRENT_BINARY_DIR}/oot3d.axf
     COMMAND ${ARM_FROMELF} --bincombined --bincombined_padding=1,0x00 ${CMAKE_CURRENT_BINARY_DIR}/oot3d.axf --output ${CMAKE_CURRENT_BINARY_DIR}/code.bin
-    COMMAND python -c "with open('${CMAKE_CURRENT_BINARY_DIR}/code.bin', 'a') as code: code.truncate(0x45B000)"
+    COMMAND python -c \"with open('${CMAKE_CURRENT_BINARY_DIR}/code.bin', 'a') as code: code.truncate(0x45B000) \"
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/code.bin
     COMMENT "Creating code.bin..."
 )

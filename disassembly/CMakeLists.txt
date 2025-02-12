@@ -10,20 +10,17 @@ set(TOOLS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tools)
 
 set(DISASM_CONFIG ${CMAKE_CURRENT_SOURCE_DIR}/oot3d.cfg)
 
-if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    set(CTRTOOL ${TOOLS_DIR}/ctrtool.exe)
-    set(N3DSDISASM ${TOOLS_DIR}/n3dsdisasm.exe)
-else()
-    set(CTRTOOL ${TOOLS_DIR}/ctrtool)
-    set(N3DSDISASM ${TOOLS_DIR}/n3dsdisasm)
-endif()
+find_program(CTRTOOL ctrtool ${TOOLS_DIR})
+find_program(N3DSDISASM n3dsdisasm ${TOOLS_DIR})
 
 add_custom_command(
     DEPENDS ${BASEROM}
-    COMMAND ${CTRTOOL} --exefsdir=${BASEROM_DIR}/exefs ${BASEROM}
-    COMMAND ${CTRTOOL} --exheader=${BASEROM_DIR}/exheader.bin ${BASEROM}
-    COMMAND ${CTRTOOL} --romfsdir=${BASEROM_DIR}/romfs ${BASEROM}
-    COMMAND ${CTRTOOL} --plainrgn=${BASEROM_DIR}/plainrgn.bin ${BASEROM}
+    COMMAND ${CTRTOOL} 
+        --exefsdir=${BASEROM_DIR}/exefs
+        --exheader=${BASEROM_DIR}/exheader.bin
+        --romfsdir=${BASEROM_DIR}/romfs
+        --plainrgn=${BASEROM_DIR}/plainrgn.bin
+        ${BASEROM}
     OUTPUT ${BASEROM_DIR}/exefs/code.bin ${BASEROM_DIR}/exheader.bin
     COMMENT "Extracting files from baserom.3ds..."
 )
