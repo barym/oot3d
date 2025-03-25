@@ -15,13 +15,10 @@ def ReadAllLines(fileName: Path) -> list[str]:
 
 
 def GetFiles(path: Path, ext) -> list[Path]:
-    files: list[Path] = list()
-    
-    for (dirpath, _, filenames) in path.walk():
-        for file in filenames:
-            if Path(file).suffix == ext:
-                files.append(dirpath / file)
-
+    files: list[Path] = []
+    for file in path.rglob(f'*{ext}'):
+        if file.is_file() and file.suffix == ext:
+            files.append(file)
     return files
 
 
@@ -69,6 +66,25 @@ def GetTotalNonMatchSize() -> int:
         size += GetSizeOfASMSourceFile(nonMatchFunction)
     return size
 
+def progressBar(percentage: float, width: int = 30) -> str:
+    """Returns a more accurate progress bar string based on percentage using fractional blocks."""
+    # Calculate the total block units (each block has 8 sub-units)
+    total_units = percentage * width * 8 / 100
+    full_units = int(total_units)  # total filled sub-units
+    full_blocks = full_units // 8  # complete blocks
+    partial_unit = full_units % 8   # remaining sub-unit
+    
+    # Unicode characters for fractional blocks; index 0 is empty.
+    blocks = ["", "▏", "▎", "▍", "▌", "▋", "▊", "▉"]
+    
+    bar = "█" * full_blocks  # full blocks
+    if partial_unit > 0:
+        bar += blocks[partial_unit]
+    
+    # Pad the bar to the desired width
+    bar = bar.ljust(width, " ")
+    return f"[{bar}] {percentage:.4f}%"
+
 
 nonMatchingASMSize: int = GetTotalNonMatchSize()
 
@@ -90,20 +106,22 @@ elif args.format == 'shield-json':
     # https://shields.io/endpoint
     print(json.dumps({
         "schemaVersion": 1,
-        "label": "progress",
-        "message": f"{srcPct:.3g}%",
-        "color": 'yellow',
+        "label": "Progress",
+        "message": f"{srcPct:.6g}% ({srcSize}/{totalSize} bytes)",
+        "color": 'blue',
     }))
 elif args.format == 'text':
     print(f"{totalSize} total bytes of decompilable code\n")
     print(f"{srcSize} bytes decompiled in src {srcPct}%\n")
+    print(progressBar(srcPct))
     print("------------------------------------\n")
 
     heartPieces = int(srcSize / bytesPerHeartPiece)
     rupees = int(((srcSize % bytesPerHeartPiece) * 100) / bytesPerHeartPiece)
 
     if (rupees > 0):
-        print(f"You have {heartPieces}/80 heart pieces and {rupees} rupee{"s" if rupees != 1 else ""}.\n")
+        pass
+        #print(f"You have {heartPieces}/80 heart pieces and {rupees} rupee{"s" if rupees != 1 else ""}.\n")
     else:
         print(f"You have {heartPieces}/80 heart pieces.\n")
 else:
