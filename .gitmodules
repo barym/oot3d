@@ -3,4 +3,4 @@
 	url = https://github.com/3dsdecomp/asm-differ
 [submodule "library/3ds_sdk"]
 	path = library/3ds_sdk
-	url = git@github.com:zeldaret/3ds_sdk.git
+	url = https://github.com/zeldaret/3ds_sdk.git
