@@ -48586,10 +48586,6 @@ data 0x04F9000
     {
         *z_bg_spot01_fusya.o(+DATA)
     }
-    z_Bg_Spot01_Fusya_ASM.data +0
-    {
-        *(i.z_Bg_Spot01_Fusya.data)
-    }
     z_bg_spot01_idohashira.data +0
     {
         *z_bg_spot01_idohashira.o(+DATA)
