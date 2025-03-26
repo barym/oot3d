@@ -1,0 +1,1 @@
+cmake --build build -t check -j16
