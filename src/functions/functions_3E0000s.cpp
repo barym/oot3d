@@ -256,7 +256,7 @@ GLOBAL_ASM("asm/FUN_003e8738.s")
 
 GLOBAL_ASM("asm/FUN_003e87dc.s")
 
-GLOBAL_ASM("asm/BgSpot01Idosoko_DoNothing.s")
+//GLOBAL_ASM("asm/BgSpot01Idosoko_DoNothing.s")
 
 GLOBAL_ASM("asm/FUN_003e8b60.s")
 

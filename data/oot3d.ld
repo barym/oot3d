@@ -48602,10 +48602,6 @@ data 0x04F9000
     {
         *z_bg_spot01_idosoko.o(+DATA)
     }
-    z_Bg_Spot01_Idosoko_ASM.data +0
-    {
-        *(i.z_Bg_Spot01_Idosoko.data)
-    }
     z_bg_spot01_objects2.data +0
     {
         *z_bg_spot01_objects2.o(+DATA)
